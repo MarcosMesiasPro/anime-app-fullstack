@@ -14,14 +14,21 @@ exports.getCommentsByAnime = async (req, res) => {
       .limit(parseInt(limit))
       .skip(parseInt(skip));
 
-    // Si hay user autenticado, marca cuáles tienen like del user
-    if (req.user) {
-      comments.forEach(comment => {
-        comment.userLiked = comment.likes.some(
+      // ✅ Marcar cuáles tienen like del user actual
+    const commentsWithUserLiked = comments.map(comment => {
+      const commentObj = comment.toObject();
+      
+      // Si hay user autenticado, verificar si dio like
+      if (req.user) {
+        commentObj.userLiked = comment.likes.some(
           id => id.toString() === req.user.id
         );
-      });
-    }
+      } else {
+        commentObj.userLiked = false;
+      }
+      
+      return commentObj;
+    });
 
     res.status(200).json({
       success: true,
