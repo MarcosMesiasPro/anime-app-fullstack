@@ -43,3 +43,31 @@ exports.protect = async (req, res, next) => {
     });
   }
 };
+
+// ✅ NUEVO: Middleware opcional (no bloquea si no hay token)
+exports.optionalAuth = async (req, res, next) => {
+  try {
+    let token;
+
+    if (req.headers.authorization && 
+        req.headers.authorization.startsWith('Bearer')) {
+      token = req.headers.authorization.split(' ')[1];
+    }
+
+    if (token) {
+      try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        req.user = await User.findById(decoded.id);
+      } catch (error) {
+        // Token inválido, pero no bloqueamos
+        console.log('Invalid token in optional auth, continuing...');
+      }
+    }
+
+    // Continuar SIEMPRE (con o sin user)
+    next();
+  } catch (error) {
+    // No importa el error, continuamos
+    next();
+  }
+};

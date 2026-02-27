@@ -11,8 +11,8 @@ const {
 } = require('../controllers/commentController');
 const { protect } = require('../middleware/authMiddleware');
 
-// Public routes
-router.get('/anime/:animeId', getCommentsByAnime);
+// ✅ Public routes CON optional auth (para userLiked)
+router.get('/anime/:animeId', optionalAuth, getCommentsByAnime);
 router.get('/user/:userId', getCommentsByUser);
 router.get('/stats/:animeId', getCommentStats);
 
