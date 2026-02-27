@@ -1,15 +1,13 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
-// Middleware para proteger rutas
+// Middleware para proteger rutas (REQUIERE token)
 exports.protect = async (req, res, next) => {
   try {
     let token;
 
-    // Check si token existe en headers
     if (req.headers.authorization && 
         req.headers.authorization.startsWith('Bearer')) {
-      // Format: "Bearer <token>"
       token = req.headers.authorization.split(' ')[1];
     }
 
@@ -20,10 +18,7 @@ exports.protect = async (req, res, next) => {
       });
     }
 
-    // Verificar token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-    // Agregar user a req
     req.user = await User.findById(decoded.id);
 
     if (!req.user) {
@@ -33,8 +28,7 @@ exports.protect = async (req, res, next) => {
       });
     }
 
-    next(); // Continúa al siguiente middleware/controller
-
+    next();
   } catch (error) {
     console.error('Auth middleware error:', error);
     res.status(401).json({
@@ -44,7 +38,7 @@ exports.protect = async (req, res, next) => {
   }
 };
 
-// ✅ NUEVO: Middleware opcional (no bloquea si no hay token)
+// Middleware opcional (NO requiere token)
 exports.optionalAuth = async (req, res, next) => {
   try {
     let token;
