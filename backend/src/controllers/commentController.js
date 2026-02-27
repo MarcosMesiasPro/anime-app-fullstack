@@ -19,9 +19,9 @@ exports.getCommentsByAnime = async (req, res) => {
       const commentObj = comment.toObject();
       
       // Si hay user autenticado, verificar si dio like
-      if (req.user) {
+      if (req.user) {  // ← Ahora req.user existirá si hay token
         commentObj.userLiked = comment.likes.some(
-          id => id.toString() === req.user.id
+          id => id.toString() === req.user.id || id.toString() === req.user._id
         );
       } else {
         commentObj.userLiked = false;
