@@ -7,9 +7,10 @@ const {
   updateComment,
   deleteComment,
   toggleLike,
-  getCommentStats
+  getCommentStats,
+  optionalAuth
 } = require('../controllers/commentController');
-const { protect } = require('../middleware/authMiddleware');
+const { protect, optionalAuth } = require('../middleware/authMiddleware');
 
 // ✅ Public routes CON optional auth (para userLiked)
 router.get('/anime/:animeId', optionalAuth, getCommentsByAnime);
