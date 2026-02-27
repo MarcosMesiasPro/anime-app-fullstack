@@ -32,8 +32,8 @@ exports.getCommentsByAnime = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      count: comments.length,
-      data: comments
+      count: commentsWithUserLiked.length,
+      data: commentsWithUserLiked
     });
 
   } catch (error) {

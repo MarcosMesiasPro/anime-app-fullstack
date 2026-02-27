@@ -26,19 +26,24 @@ export const AuthProvider = ({ children }) => {
         try {
           // Verify token is still valid
           const { data } = await authAPI.getMe();
-          setUser(data.data);
-        } catch (error) {
-          // Token invalid
-          localStorage.removeItem('token');
-          localStorage.removeItem('user');
-          setUser(null);
-        }
+          // ✅ Normalizar
+        const normalizedUser = {
+          ...data.data,
+          id: data.data.id || data.data._id
+        };
+        
+        setUser(normalizedUser);
+      } catch (error) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        setUser(null);
       }
-      setLoading(false);
-    };
+    }
+    setLoading(false);
+  };
 
-    initAuth();
-  }, []);
+  initAuth();
+}, []);
 
   const login = async (email, password) => {
     try {
@@ -46,37 +51,50 @@ export const AuthProvider = ({ children }) => {
       const { data } = await authAPI.login({ email, password });
       
       const { user, token } = data.data;
-      
-      localStorage.setItem('token', token);
-      localStorage.setItem('user', JSON.stringify(user));
-      setUser(user);
-      
-      return { success: true };
-    } catch (error) {
-      const message = error.response?.data?.message || 'Login failed';
-      setError(message);
-      return { success: false, error: message };
-    }
-  };
 
-  const register = async (name, email, password) => {
-    try {
-      setError(null);
-      const { data } = await authAPI.register({ name, email, password });
-      
-      const { user, token } = data.data;
-      
-      localStorage.setItem('token', token);
-      localStorage.setItem('user', JSON.stringify(user));
-      setUser(user);
-      
-      return { success: true };
-    } catch (error) {
-      const message = error.response?.data?.message || 'Registration failed';
-      setError(message);
-      return { success: false, error: message };
-    }
-  };
+      // ✅ Normalizar: agregar 'id' si solo hay '_id'
+    // ✅ Normalizar: agregar 'id' si solo hay '_id'
+    const normalizedUser = {
+      ...user,
+      id: user.id || user._id  // Usa 'id' si existe, sino '_id'
+    };
+    
+    localStorage.setItem('token', token);
+    localStorage.setItem('user', JSON.stringify(normalizedUser));
+    setUser(normalizedUser);
+    
+    return { success: true };
+  } catch (error) {
+    const message = error.response?.data?.message || 'Login failed';
+    setError(message);
+    return { success: false, error: message };
+  }
+};
+
+const register = async (name, email, password) => {
+  try {
+    setError(null);
+    const { data } = await authAPI.register({ name, email, password });
+    
+    const { user, token } = data.data;
+    
+    // ✅ Normalizar: agregar 'id' si solo hay '_id'
+    const normalizedUser = {
+      ...user,
+      id: user.id || user._id
+    };
+    
+    localStorage.setItem('token', token);
+    localStorage.setItem('user', JSON.stringify(normalizedUser));
+    setUser(normalizedUser);
+    
+    return { success: true };
+  } catch (error) {
+    const message = error.response?.data?.message || 'Registration failed';
+    setError(message);
+    return { success: false, error: message };
+  }
+};
 
   const logout = () => {
     localStorage.removeItem('token');

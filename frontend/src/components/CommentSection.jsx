@@ -4,6 +4,13 @@ import { useAuth } from '../context/AuthContext';
 
 const CommentSection = ({ animeId, animeTitle }) => {
   const { user } = useAuth();
+
+  // ✅ DEBUG COMPLETO
+  console.log('🔍 AUTH DEBUG:');
+  console.log('User object:', user);
+  console.log('User ID:', user?.id);
+  console.log('User _id:', user?._id);
+  console.log('User email:', user?.email);
   
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState('');
@@ -194,23 +201,28 @@ const CommentSection = ({ animeId, animeTitle }) => {
                   </div>
                 </div>
 
+                {/* ✅ DEBUG: Ver valores */}
+                {console.log('Current user ID:', user?.id)}
+                {console.log('Comment user ID:', comment.user?._id)}
+                {console.log('Match?:', user?.id === comment.user?._id)}
+
                 {/* Actions (if own comment) */}
-                {user && user.id === comment.user._id && (
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => handleStartEdit(comment)}
-                      className="text-gray-400 hover:text-white text-sm"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => handleDelete(comment._id)}
-                      className="text-gray-400 hover:text-red-500 text-sm"
-                    >
-                      Delete
-                    </button>
-                  </div>
-                )}
+                      {user && comment.user && comment.user._id === user.id && (
+                          <div className="flex gap-2">
+                              <button
+                                  onClick={() => handleStartEdit(comment)}
+                                  className="text-gray-400 hover:text-white text-sm"
+                              >
+                                  Edit
+                              </button>
+                              <button
+                                  onClick={() => handleDelete(comment._id)}
+                                  className="text-gray-400 hover:text-red-500 text-sm"
+                              >
+                                  Delete
+                              </button>
+                          </div>
+                      )}
               </div>
 
               {/* Comment Content */}
@@ -245,6 +257,7 @@ const CommentSection = ({ animeId, animeTitle }) => {
               )}
 
               {/* Like Button */}
+              {console.log('User Like:', comment?.userLiked)}
               {user && (
                 <button
                   onClick={() => handleToggleLike(comment._id)}
