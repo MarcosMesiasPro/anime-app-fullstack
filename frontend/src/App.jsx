@@ -8,6 +8,7 @@ import Register from './pages/Register';
 import Home from './pages/Home';
 import Favorites from './pages/Favorites';
 import AnimeDetail from './pages/AnimeDetail';
+import Profile from './pages/Profile'; // ← NUEVO
 
 // Layout
 import Header from './components/Header';
@@ -42,11 +43,11 @@ function App() {
               }
             />
             <Route
-              path="/anime/:id"
+              path="/profile/:id"
               element={
                 <ProtectedRoute>
                   <Header />
-                  <AnimeDetail />
+                  <Profile />
                 </ProtectedRoute>
               }
             />

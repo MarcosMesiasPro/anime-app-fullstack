@@ -37,14 +37,17 @@ const Header = () => {
 
             {/* User Menu */}
             <div className="flex items-center space-x-4 pl-4 border-l border-gray-700">
-              <div className="flex items-center space-x-2">
+              <Link
+                to={`/profile/${user?._id}`}
+                className="flex items-center space-x-2 hover:opacity-80 transition"
+              >
                 <img
                   src={user?.avatar}
                   alt={user?.name}
                   className="w-8 h-8 rounded-full"
                 />
                 <span className="text-sm text-gray-300">{user?.name}</span>
-              </div>
+              </Link>
               
               <button
                 onClick={handleLogout}

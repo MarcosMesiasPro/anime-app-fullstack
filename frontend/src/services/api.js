@@ -64,4 +64,12 @@ export const commentsAPI = {
   getStats: (animeId) => api.get(`/comments/stats/${animeId}`)
 };
 
+// User endpoints
+export const userAPI = {
+  getProfile: (userId) => api.get(`/users/${userId}`),
+  updateProfile: (data) => api.put('/users/profile', data),
+  getFavorites: (userId, params) => api.get(`/users/${userId}/favorites`, { params }),
+  getComments: (userId, params) => api.get(`/users/${userId}/comments`, { params })
+};
+
 export default api;

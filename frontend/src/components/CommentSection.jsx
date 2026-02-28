@@ -184,9 +184,12 @@ const CommentSection = ({ animeId, animeTitle }) => {
                     className="w-8 h-8 rounded-full"
                   />
                   <div>
-                    <p className="text-sm font-semibold text-white">
+                    <Link
+                      to={`/profile/${comment.user._id}`}
+                      className="text-sm font-semibold text-white hover:text-blue-400 transition"
+                    >
                       {comment.user.name}
-                    </p>
+                    </Link>
                     <p className="text-xs text-gray-400">
                       {new Date(comment.createdAt).toLocaleDateString()}
                       {comment.isEdited && ' (edited)'}
