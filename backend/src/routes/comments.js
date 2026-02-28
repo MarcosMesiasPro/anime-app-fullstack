@@ -12,6 +12,7 @@ const {
 
 // ✅ optionalAuth viene del MIDDLEWARE, no del controller
 const { protect, optionalAuth } = require('../middleware/authMiddleware');
+const { commentLimiter, likeLimiter } = require('../middleware/rateLimiter'); // ← NUEVO
 
 // Public routes CON optional auth
 router.get('/anime/:animeId', optionalAuth, getCommentsByAnime);
@@ -19,9 +20,9 @@ router.get('/user/:userId', getCommentsByUser);
 router.get('/stats/:animeId', getCommentStats);
 
 // Protected routes
-router.post('/', protect, createComment);
+router.post('/', protect, commentLimiter, createComment); // ← Limiter
 router.put('/:id', protect, updateComment);
 router.delete('/:id', protect, deleteComment);
-router.post('/:id/like', protect, toggleLike);
+router.post('/:id/like', protect, likeLimiter, toggleLike); // ← Limiter
 
 module.exports = router;

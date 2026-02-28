@@ -1,5 +1,14 @@
 const Comment = require('../models/Comment');
 
+// ✅ NUEVO: Helper para limpiar HTML
+const sanitizeHtml = (text) => {
+  return text
+    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '') // Remove scripts
+    .replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, '') // Remove iframes
+    .replace(/<object\b[^<]*(?:(?!<\/object>)<[^<]*)*<\/object>/gi, '') // Remove objects
+    .trim();
+};
+
 // @desc    Get comments for an anime
 // @route   GET /api/comments/anime/:animeId
 // @access  Public
@@ -89,10 +98,20 @@ exports.createComment = async (req, res) => {
       });
     }
 
-    if (text.trim().length === 0) {
+    // ✅ NUEVO: Sanitize input
+    const sanitizedText = sanitizeHtml(text.trim());
+
+    if (sanitizedText.length === 0) {
       return res.status(400).json({
         success: false,
         message: 'Comment cannot be empty'
+      });
+    }
+
+    if (sanitizedText.length > 500) {
+      return res.status(400).json({
+        success: false,
+        message: 'Comment cannot exceed 500 characters'
       });
     }
 
@@ -101,10 +120,9 @@ exports.createComment = async (req, res) => {
       user: req.user.id,
       animeId,
       animeTitle,
-      text: text.trim()
+      text: sanitizedText  // ← Texto limpio
     });
 
-    // Populate user data para retornar
     await comment.populate('user', 'name avatar');
 
     res.status(201).json({
@@ -128,10 +146,27 @@ exports.updateComment = async (req, res) => {
   try {
     const { text } = req.body;
 
-    if (!text || text.trim().length === 0) {
+    if (!text) {
       return res.status(400).json({
         success: false,
         message: 'Comment text is required'
+      });
+    }
+
+    // ✅ Sanitize
+    const sanitizedText = sanitizeHtml(text.trim());
+
+    if (sanitizedText.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Comment cannot be empty'
+      });
+    }
+
+    if (sanitizedText.length > 500) {
+      return res.status(400).json({
+        success: false,
+        message: 'Comment cannot exceed 500 characters'
       });
     }
 
@@ -145,7 +180,8 @@ exports.updateComment = async (req, res) => {
     }
 
     // Verificar ownership
-    if (comment.user.toString() !== req.user.id) {
+    if (comment.user.toString() !== req.user.id && 
+        comment.user.toString() !== req.user._id.toString()) {
       return res.status(403).json({
         success: false,
         message: 'Not authorized to update this comment'
@@ -153,7 +189,7 @@ exports.updateComment = async (req, res) => {
     }
 
     // Actualizar
-    comment.text = text.trim();
+    comment.text = sanitizedText;
     comment.isEdited = true;
     comment.editedAt = Date.now();
     await comment.save();
