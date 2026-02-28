@@ -1,4 +1,7 @@
 const Comment = require('../models/Comment');
+const asyncHandler = require('../middleware/asyncHandler'); // ← NUEVO
+const ErrorResponse = require('../utils/errorResponse'); // ← NUEVO
+const logger = require('../config/logger');
 
 // ✅ NUEVO: Helper para limpiar HTML
 const sanitizeHtml = (text) => {
@@ -86,58 +89,48 @@ exports.getCommentsByUser = async (req, res) => {
 // @desc    Create comment
 // @route   POST /api/comments
 // @access  Private
-exports.createComment = async (req, res) => {
-  try {
-    const { animeId, animeTitle, text } = req.body;
+exports.createComment = asyncHandler(async (req, res, next) => { // ← asyncHandler wrapper
+  const { animeId, animeTitle, text } = req.body;
 
-    // Validación
-    if (!animeId || !animeTitle || !text) {
-      return res.status(400).json({
-        success: false,
-        message: 'Please provide animeId, animeTitle and text'
-      });
-    }
-
-    // ✅ NUEVO: Sanitize input
-    const sanitizedText = sanitizeHtml(text.trim());
-
-    if (sanitizedText.length === 0) {
-      return res.status(400).json({
-        success: false,
-        message: 'Comment cannot be empty'
-      });
-    }
-
-    if (sanitizedText.length > 500) {
-      return res.status(400).json({
-        success: false,
-        message: 'Comment cannot exceed 500 characters'
-      });
-    }
-
-    // Crear comentario
-    const comment = await Comment.create({
-      user: req.user.id,
-      animeId,
-      animeTitle,
-      text: sanitizedText  // ← Texto limpio
-    });
-
-    await comment.populate('user', 'name avatar');
-
-    res.status(201).json({
-      success: true,
-      data: comment
-    });
-
-  } catch (error) {
-    console.error('Create comment error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Server error'
-    });
+  // Validación
+  if (!animeId || !animeTitle || !text) {
+    // ✅ Lanza custom error
+    throw new ErrorResponse('Please provide animeId, animeTitle and text', 400);
   }
-};
+
+  const sanitizedText = sanitizeHtml(text.trim());
+
+  if (sanitizedText.length === 0) {
+    throw new ErrorResponse('Comment cannot be empty', 400);
+  }
+
+  if (sanitizedText.length > 500) {
+    throw new ErrorResponse('Comment cannot exceed 500 characters', 400);
+  }
+
+  // Crear comentario
+  const comment = await Comment.create({
+    user: req.user.id,
+    animeId,
+    animeTitle,
+    text: sanitizedText
+  });
+
+  await comment.populate('user', 'name avatar');
+
+  logger.info('Comment created', {
+    userId: req.user.id,
+    animeId,
+    commentId: comment._id
+  });
+
+  res.status(201).json({
+    success: true,
+    data: comment
+  });
+  
+  // ✅ NO más try-catch, asyncHandler lo maneja
+});
 
 // @desc    Update comment
 // @route   PUT /api/comments/:id
@@ -213,41 +206,34 @@ exports.updateComment = async (req, res) => {
 // @desc    Delete comment
 // @route   DELETE /api/comments/:id
 // @access  Private (only comment owner)
-exports.deleteComment = async (req, res) => {
-  try {
-    const comment = await Comment.findById(req.params.id);
+exports.deleteComment = asyncHandler(async (req, res, next) => {
+  const comment = await Comment.findById(req.params.id);
 
-    if (!comment) {
-      return res.status(404).json({
-        success: false,
-        message: 'Comment not found'
-      });
-    }
-
-    // Verificar ownership
-    if (comment.user.toString() !== req.user.id) {
-      return res.status(403).json({
-        success: false,
-        message: 'Not authorized to delete this comment'
-      });
-    }
-
-    await comment.deleteOne();
-
-    res.status(200).json({
-      success: true,
-      message: 'Comment deleted',
-      data: {}
-    });
-
-  } catch (error) {
-    console.error('Delete comment error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Server error'
-    });
+  if (!comment) {
+    // ✅ Error 404 automático
+    throw new ErrorResponse('Comment not found', 404);
   }
-};
+
+  // Verificar ownership
+  if (comment.user.toString() !== req.user.id && 
+      comment.user.toString() !== req.user._id.toString()) {
+    // ✅ Error 403 automático
+    throw new ErrorResponse('Not authorized to delete this comment', 403);
+  }
+
+  await comment.deleteOne();
+
+  logger.info('Comment deleted', {
+    userId: req.user.id,
+    commentId: comment._id
+  });
+
+  res.status(200).json({
+    success: true,
+    message: 'Comment deleted',
+    data: {}
+  });
+});
 
 // @desc    Toggle like on comment
 // @route   POST /api/comments/:id/like
