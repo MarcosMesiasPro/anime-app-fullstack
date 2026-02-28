@@ -29,6 +29,7 @@ app.use(mongoSanitize());
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/favorites', require('./routes/favorites')); // ✅ NUEVO
 app.use('/api/comments', require('./routes/comments')); // ✅ NUEVO
+app.use('/api/users', require('./routes/users')); // ✅ NUEVO
 
 // Health check
 app.use('/api/health', require('./routes/health'));
