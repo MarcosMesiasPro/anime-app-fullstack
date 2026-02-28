@@ -10,6 +10,9 @@ const logger = require('./config/logger'); // ← NUEVO
 // Initialize app
 const app = express();
 
+// ✅ NUEVO: Trust proxy (CRITICAL for production behind reverse proxy)
+app.set('trust proxy', 1);
+
 // Connect to database
 connectDB();
 
