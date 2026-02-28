@@ -10,7 +10,7 @@ const logger = require('./config/logger');
 // Initialize app
 const app = express();
 
-// ✅ Trust proxy (CRITICAL for production behind reverse proxy)
+// ✅ Trust proxy PRIMERO
 app.set('trust proxy', 1);
 
 // Connect to database
@@ -19,11 +19,19 @@ connectDB();
 logger.info('🚀 Starting server...');
 logger.info(`📍 Environment: ${process.env.NODE_ENV}`);
 
-// Middleware
+// ✅ ORDEN CORRECTO DE MIDDLEWARE:
+
+// 1. CORS primero
 app.use(cors());
+
+// 2. Body parsers
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// 3. Sanitization
 app.use(mongoSanitize());
+
+// 4. Rate limiting DESPUÉS de body parsers
 app.use('/api/', apiLimiter);
 
 // Routes
@@ -49,7 +57,7 @@ app.get('/', (req, res) => {
   });
 });
 
-// ✅ Error handler (MUST be last, after all routes)
+// Error handler (last)
 app.use(errorHandler);
 
 // Start server

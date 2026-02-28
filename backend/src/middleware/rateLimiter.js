@@ -9,7 +9,14 @@ const apiLimiter = rateLimit({
     message: 'Too many requests from this IP, please try again later.'
   },
   standardHeaders: true, // Return rate limit info in headers
-  legacyHeaders: false
+  legacyHeaders: false,
+  // ✅ NUEVO: Handler custom para evitar conflictos
+  handler: (req, res) => {
+    res.status(429).json({
+      success: false,
+      message: 'Too many requests from this IP, please try again later.'
+    });
+  }
 });
 
 // Auth endpoints (más estricto)
