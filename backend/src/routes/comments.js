@@ -20,10 +20,10 @@ router.get('/user/:userId', getCommentsByUser);
 router.get('/stats/:animeId', getCommentStats);
 
 // Protected routes
-// router.post('/', protect, commentLimiter, createComment); // ← Limiter
+router.post('/', protect, commentLimiter, createComment); // ← Limiter
 router.put('/:id', protect, updateComment);
 router.delete('/:id', protect, deleteComment);
-// router.post('/:id/like', protect, likeLimiter, toggleLike); // ← Limiter
+router.post('/:id/like', protect, likeLimiter, toggleLike); // ← Limiter
 router.post('/', protect, createComment);
 router.post('/:id/like', protect, toggleLike);
 

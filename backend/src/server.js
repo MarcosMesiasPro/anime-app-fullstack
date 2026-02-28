@@ -32,7 +32,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(mongoSanitize());
 
 // 4. Rate limiting DESPUÉS de body parsers
-// app.use('/api/', apiLimiter);
+app.use('/api/', apiLimiter);
 
 // Routes
 app.use('/api/auth', require('./routes/auth'));
