@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
+import EditProfile from './pages/EditProfile'; // ← NUEVO
 
 // Pages
 import Login from './pages/Login';
@@ -48,6 +49,15 @@ function App() {
                 <ProtectedRoute>
                   <Header />
                   <Profile />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/profile/edit"
+              element={
+                <ProtectedRoute>
+                  <Header />
+                  <EditProfile />
                 </ProtectedRoute>
               }
             />

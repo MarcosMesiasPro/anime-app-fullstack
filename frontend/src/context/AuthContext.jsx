@@ -109,7 +109,8 @@ const register = async (name, email, password) => {
     login,
     register,
     logout,
-    isAuthenticated: !!user
+    isAuthenticated: !!user,
+    setUser  // ✅ AGREGAR ESTO
   };
 
   return (
