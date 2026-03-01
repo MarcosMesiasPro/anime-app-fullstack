@@ -16,7 +16,7 @@ const Profile = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const isOwnProfile = currentUser?._id === id;
+  const isOwnProfile = currentUser?.id === id;
 
   // Fetch profile data
   useEffect(() => {
@@ -25,7 +25,12 @@ const Profile = () => {
         setIsLoading(true);
         setError(null);
 
+        console.log('🔍 Fetching profile for user ID:', id);
+        console.log('🔍 API URL:', import.meta.env.VITE_API_URL);
+
         const { data } = await userAPI.getProfile(id);
+
+        console.log('✅ Profile data received:', data);
         
         setProfile(data.data.user);
         

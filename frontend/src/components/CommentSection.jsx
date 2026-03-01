@@ -198,7 +198,7 @@ const CommentSection = ({ animeId, animeTitle }) => {
                 </div>
 
                 {/* Actions (if own comment) */}
-                      {user && comment.user && comment.user._id === user.id && (
+                      {user && comment.user && (user.id === comment.user._id || user.id === comment.user.id) && (
                           <div className="flex gap-2">
                               <button
                                   onClick={() => handleStartEdit(comment)}
