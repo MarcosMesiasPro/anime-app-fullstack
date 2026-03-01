@@ -9,7 +9,6 @@ const Header = () => {
     logout();
     navigate('/login');
   };
-
   return (
     <header className="bg-gray-800 border-b border-gray-700">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -37,9 +36,6 @@ const Header = () => {
 
             {/* User Menu */}
             <div className="flex items-center space-x-4 pl-4 border-l border-gray-700">
-              {console.log('🔍 Header - User object:', user)}
-              {console.log('🔍 Header - User _id:', user?._id)}
-              {console.log('🔍 Header - User id:', user?.id)}
               <Link
                 to={`/profile/${user?.id}`}
                 className="flex items-center space-x-2 hover:opacity-80 transition"
