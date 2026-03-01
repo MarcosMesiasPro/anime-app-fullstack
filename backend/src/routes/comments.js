@@ -1,0 +1,30 @@
+const express = require('express');
+const router = express.Router();
+const {
+  getCommentsByAnime,
+  getCommentsByUser,
+  createComment,
+  updateComment,
+  deleteComment,
+  toggleLike,
+  getCommentStats
+} = require('../controllers/commentController');
+
+// ✅ optionalAuth viene del MIDDLEWARE, no del controller
+const { protect, optionalAuth } = require('../middleware/authMiddleware');
+const { commentLimiter, likeLimiter } = require('../middleware/rateLimiter'); // ← NUEVO
+
+// Public routes CON optional auth
+router.get('/anime/:animeId', optionalAuth, getCommentsByAnime);
+router.get('/user/:userId', getCommentsByUser);
+router.get('/stats/:animeId', getCommentStats);
+
+// Protected routes
+router.post('/', protect, commentLimiter, createComment); // ← Limiter
+router.put('/:id', protect, updateComment);
+router.delete('/:id', protect, deleteComment);
+router.post('/:id/like', protect, likeLimiter, toggleLike); // ← Limiter
+router.post('/', protect, createComment);
+router.post('/:id/like', protect, toggleLike);
+
+module.exports = router;
