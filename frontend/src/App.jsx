@@ -43,6 +43,15 @@ function App() {
                 </ProtectedRoute>
               }
             />
+             <Route
+              path="/anime/:id"
+              element={
+                <ProtectedRoute>
+                  <Header />
+                  <AnimeDetail />
+                </ProtectedRoute>
+              }
+            />
             <Route
               path="/profile/:id"
               element={

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom'; // ✅ AGREGAR ESTO
 import { commentsAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 
